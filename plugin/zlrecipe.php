@@ -1255,13 +1255,25 @@ function amd_zlrecipe_format_recipe($recipe) { //!!mwp
 	//!!dc open the zlmeta and fl-l container divs
 	$output .= '<div class="zlmeta zlclear">
       <div class="fl-l width-50">';
+      
+    $recipeRating = 0;
+    $recipeVoteCount = 1;
+    if($recipe->rating != 0){
+        $recipeRating = $recipe->rating;
+    }
+    else{
+        $voteAvgRow = $wpdb->get_row("SELECT ROUND(AVG(vote),1) AS voteavg FROM `wp_gdsr_votes_log` WHERE id=" . $recipe->post_id);
+        $recipeRating = $voteAvgRow->voteavg;
+        $voteCountRow = $wpdb->get_row("SELECT COUNT(*) AS votecnt FROM `wp_gdsr_votes_log` WHERE id=" . $recipe->post_id);
+        $recipeVoteCount = $voteCountRow->votecnt;
+    }
 
-    if ($recipe->rating != 0) {
+    if ($recipeRating != 0) {
         $output .= '<p id="zlrecipe-rating" class="review hreview-aggregate">';
         if (strcmp(get_option('zlrecipe_rating_label_hide'), 'Hide') != 0) {
         	$output .= get_option('zlrecipe_rating_label') . ' ';
         }
-        $output .= '<span class="rating rating-' . $recipe->rating . '"><span class="average">' . $recipe->rating . '</span><span class="count" style="display: none;">1</span></span>
+        $output .= '<span class="rating rating-' . $recipe->rating . '"><span class="average">' . $recipeRating . '</span><span class="count" style="display: none;">' . $recipeVoteCount . '</span></span>
        </p>';
     }
     
